@@ -26,8 +26,10 @@ namespace krpcisru
                     if (thatmodule is ModuleResourceHarvester)
                     {
                         var thatdrill = thatmodule as ModuleResourceHarvester;
+                        if(thatdrill.enabled== true) {
+                        }
                         thatdrill.StartResourceConverter();
-                        flag = 1;
+                        flag++;
                     }
                 }
             }
@@ -47,7 +49,7 @@ namespace krpcisru
                     {
                         var thatdrill = thatmodule as ModuleResourceHarvester;
                         thatdrill.StopResourceConverter();
-                        flag = 1;
+                        flag++;
                     }
                 }
             }
@@ -67,14 +69,16 @@ namespace krpcisru
                     if (thatmodule is ModuleAnimationGroup)
                     {
                         var thatdeploy = thatmodule as ModuleAnimationGroup;
-                        if (thatdeploy.moduleType == "Drill") { 
+                        if (thatdeploy.moduleType == "Drill") {
+                            flag++;
                             if (thatdeploy.isDeployed== false) {
                                 thatdeploy.DeployModule();
+                                
                             }
                             
                         }
 
-                        flag = 1;
+                        
                     }
                 }
             }
@@ -94,14 +98,15 @@ namespace krpcisru
                     if (thatmodule is ModuleAnimationGroup)
                     {
                         var thatdeploy = thatmodule as ModuleAnimationGroup;
-                        if (thatdeploy.moduleType == "Drill") { 
+                        if (thatdeploy.moduleType == "Drill") {
+                            flag++;
                             if (thatdeploy.isDeployed== true) {
-                                thatdeploy.RetractModule()
+                                thatdeploy.RetractModule();
+                                
                             }
 
 }
 
-flag = 1;
                     }
                 }
             }
@@ -125,7 +130,7 @@ flag = 1;
                         if (thatconverter.ConverterName == cvname)
                         {
                             thatconverter.StartResourceConverter();
-                            flag = 1;
+                            flag++;
                         }
 
                     }
@@ -149,13 +154,61 @@ flag = 1;
                         if (thatconverter.ConverterName == cvname)
                         {
                             thatconverter.StopResourceConverter();
-                            flag = 1;
+                            flag++;
                         }
 
                     }
                 }
             }
             return flag;
+        }
+
+        [KRPCProcedure]
+        public static int IsruStopAll()
+        {
+            int flag = 0;
+            List<Part> p = FlightGlobals.ActiveVessel.parts;
+            foreach (Part thatpart in p)
+            {
+                foreach (PartModule thatmodule in thatpart.Modules)
+                {
+                    if (thatmodule is ModuleResourceConverter)
+                    {
+                        var thatconverter = thatmodule as ModuleResourceConverter;
+                        if (thatconverter.IsActivated== true)
+                        {
+                            thatconverter.StopResourceConverter();
+                            flag++;
+                        }
+
+                    }
+                }
+            }
+            return flag;
+        }
+
+
+        [KRPCProcedure]
+        public static string IsruList()
+        {
+            string returnstring = "";
+
+            List<Part> p = FlightGlobals.ActiveVessel.parts;
+            foreach (Part thatpart in p)
+            {
+                foreach (PartModule thatmodule in thatpart.Modules)
+                {
+                    if (thatmodule is ModuleResourceConverter)
+                    {
+                        var thatconverter = thatmodule as ModuleResourceConverter;
+                        if (returnstring != "") { returnstring += ","; }
+                        returnstring += thatconverter.ConverterName ;
+         
+                    }
+                }
+            }
+          //  if (isruc.Count() == 0) { isruc.Add("No ISRU Converters Found");}
+            return returnstring;
         }
 
 
